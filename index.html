@@ -5,11 +5,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-<link rel="manifest" href="manifest.json">
 
 <title>Sistema Entretenimiento Autobús</title>
 
@@ -20,18 +15,17 @@ html, body{
     padding:0;
     height:100%;
     overflow:hidden;
-    touch-action:none;
     background:#111;
     font-family:Arial, sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
 }
 
-/* altura real en móviles */
+/* viewport real móvil */
 body{
     height:100vh;
     height:100dvh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
 .tablet{
@@ -43,50 +37,19 @@ body{
     border-radius:20px;
     overflow:hidden;
     box-shadow:0 0 40px rgba(0,0,0,0.9);
+    display:flex;
 }
 
 .screen{
-    width:100%;
-    height:100%;
-    background:#1a1a1a;
-    color:white;
-    display:flex;
-    flex-direction:column;
-    position:relative;
-}
-
-.center{
     flex:1;
     display:flex;
-    justify-content:center;
-    align-items:center;
     flex-direction:column;
-    text-align:center;
-}
-
-button{
-    padding:6px 12px;
-    border:none;
-    border-radius:6px;
-    background:#ff7a00;
+    background:#1a1a1a;
     color:white;
-    font-weight:bold;
-    cursor:pointer;
+    overflow:hidden;
 }
 
-button:hover{
-    background:#ff9d3b;
-}
-
-.loading-logo{
-    font-size:80px;
-    animation:moveBus 1s infinite alternate;
-}
-
-@keyframes moveBus{
-    from{transform:translateX(-20px);}
-    to{transform:translateX(20px);}
-}
+/* --- layout vertical correcto --- */
 
 .topbar{
     padding:15px 25px;
@@ -95,7 +58,35 @@ button:hover{
     justify-content:space-between;
     align-items:center;
     font-size:18px;
-    position:relative;
+    flex-shrink:0;
+}
+
+.footer{
+    padding:12px;
+    background:#111;
+    text-align:center;
+    font-size:14px;
+    color:#777;
+    flex-shrink:0;
+}
+
+/* área que crece y puede hacer scroll */
+.content{
+    flex:1;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+}
+
+/* --- pantallas --- */
+
+.center{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
 }
 
 .menu{
@@ -116,7 +107,7 @@ button:hover{
     justify-content:center;
     align-items:center;
     cursor:pointer;
-    transition:0.3s;
+    transition:.3s;
     aspect-ratio:1/1;
     font-size:18px;
 }
@@ -132,9 +123,7 @@ button:hover{
 }
 
 .list{
-    flex:1;
     padding:30px;
-    overflow-y:auto;
 }
 
 .video-item{
@@ -152,18 +141,18 @@ button:hover{
     background:#3a3a3a;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
-    gap:25px;
+button{
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    background:#ff7a00;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.grid .video-item{
-    flex-direction:column;
-    align-items:center;
-    text-align:center;
-    aspect-ratio:1/1;
-    justify-content:center;
+button:hover{
+    background:#ff9d3b;
 }
 
 .back{
@@ -171,40 +160,7 @@ button:hover{
     color:#ff7a00;
 }
 
-.footer{
-    padding:12px;
-    background:#111;
-    text-align:center;
-    font-size:14px;
-    color:#777;
-}
-
-.menu-dots{
-    cursor:pointer;
-    font-size:24px;
-}
-
-.dropdown{
-    position:absolute;
-    right:25px;
-    top:55px;
-    background:#2b2b2b;
-    border-radius:8px;
-    overflow:hidden;
-    display:none;
-    flex-direction:column;
-}
-
-.dropdown div{
-    padding:10px 20px;
-    cursor:pointer;
-}
-
-.dropdown div:hover{
-    background:#ff7a00;
-}
-
-/* VIDEO FULLSCREEN */
+/* video fullscreen */
 
 .fullscreen-video{
     position:absolute;
@@ -213,14 +169,6 @@ button:hover{
     z-index:999;
     display:flex;
     flex-direction:column;
-}
-
-.video-header{
-    padding:15px 25px;
-    background:rgba(0,0,0,0.8);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
 }
 
 .video-frame{
@@ -233,22 +181,6 @@ button:hover{
     border:none;
 }
 
-/* bloquear uso vertical */
-@media screen and (orientation: portrait){
-    body::before{
-        content:"Gira la pantalla";
-        position:fixed;
-        inset:0;
-        background:#000;
-        color:#fff;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:30px;
-        z-index:9999;
-    }
-}
-
 </style>
 </head>
 
@@ -256,142 +188,99 @@ button:hover{
 
 <div class="tablet">
 <div id="screen" class="screen">
+
 <div class="center">
 <h1>Sistema de Entretenimiento</h1>
 <button onclick="startSimulation()">Iniciar Sistema</button>
 </div>
+
 </div>
 </div>
 
 <script>
 
-let currentAlbum=null;
 let previousScreen="";
+let currentAlbum=null;
 
 function startSimulation(){
-    const screen=document.getElementById("screen");
-    screen.innerHTML=`
-        <div class="center">
-            <div class="loading-logo">🚌</div>
+    const s=document.getElementById("screen");
+    s.innerHTML=`
+        <div class="content center">
             <h2>Cargando contenido...</h2>
         </div>
     `;
-    setTimeout(showMenu,2000);
+    setTimeout(showMenu,1500);
 }
 
-function showMenu(){
-    const screen=document.getElementById("screen");
-    screen.innerHTML=`
-        <div class="topbar">
-            <span>Bienvenido</span>
-            <span>Autobuses Black</span>
-        </div>
-
-        <div class="menu">
-            <div class="card" onclick="showAlbums()">
-                <div class="icon">📁</div>
-                Álbumes
-            </div>
-            <div class="card" onclick="showAllVideos()">
-                <div class="icon">🎬</div>
-                Videos
-            </div>
-        </div>
-
-        <div class="footer">
-            Contenido especializado para tu viaje
-        </div>
+function layout(top,content,footer){
+    return `
+        <div class="topbar">${top}</div>
+        <div class="content">${content}</div>
+        <div class="footer">${footer}</div>
     `;
 }
 
-function showAlbums(){
-    const screen=document.getElementById("screen");
-    screen.innerHTML=`
-        <div class="topbar">
-            <span class="back" onclick="showMenu()">← Regresar</span>
-            <span>Álbumes</span>
-        </div>
+function showMenu(){
+    const s=document.getElementById("screen");
+    s.innerHTML=layout(
+        `Bienvenido <span>Autobuses Black</span>`,
+        `<div class="menu">
+            <div class="card" onclick="showAlbums()">
+                <div class="icon">📁</div>Álbumes
+            </div>
+            <div class="card" onclick="showVideos()">
+                <div class="icon">🎬</div>Videos
+            </div>
+        </div>`,
+        `Contenido especializado para tu viaje`
+    );
+}
 
-        <div class="list">
+function showAlbums(){
+    const s=document.getElementById("screen");
+    s.innerHTML=layout(
+        `<span class="back" onclick="showMenu()">← Regresar</span> Álbumes`,
+        `<div class="list">
             <div class="video-item" onclick="showVideos('Acción')">🎥 Acción</div>
             <div class="video-item" onclick="showVideos('Infantil')">👶 Infantil</div>
             <div class="video-item" onclick="showVideos('Comedia')">😂 Comedia</div>
             <div class="video-item" onclick="showVideos('Documentales')">📚 Documentales</div>
-        </div>
-
-        <div class="footer">
-            Sistema bloqueado - Solo contenido autorizado
-        </div>
-    `;
-}
-
-function showAllVideos(){
-    showVideos();
+        </div>`,
+        `Sistema bloqueado - Solo contenido autorizado`
+    );
 }
 
 function showVideos(album=null){
     currentAlbum=album;
-    const screen=document.getElementById("screen");
-
-    let videos="";
+    let items="";
     for(let i=1;i<=40;i++){
-        videos+=`
+        items+=`
         <div class="video-item">
             <div>🎬 Video ${i} ${album?'- '+album:''}</div>
             <button onclick="playVideo()">▶</button>
         </div>`;
     }
 
-    screen.innerHTML=`
-        <div class="topbar">
-            <span class="back" onclick="${album?'showAlbums()':'showMenu()'}">← Regresar</span>
-            <span>${album?album:'Videos Disponibles'}</span>
-            <span class="menu-dots" onclick="toggleMenu()">⋮</span>
-
-            <div id="dropdown" class="dropdown">
-                <div onclick="setMode('list')">Modo Lista</div>
-                <div onclick="setMode('grid')">Modo Mosaico</div>
-            </div>
-        </div>
-
-        <div id="videoContainer" class="list">
-            ${videos}
-        </div>
-
-        <div class="footer">
-            Sistema bloqueado - Solo contenido autorizado
-        </div>
-    `;
-}
-
-function toggleMenu(){
-    const m=document.getElementById("dropdown");
-    m.style.display=m.style.display==="flex"?"none":"flex";
-}
-
-function setMode(mode){
-    const c=document.getElementById("videoContainer");
-    c.className=mode==="grid"?"list grid":"list";
-    document.getElementById("dropdown").style.display="none";
+    const s=document.getElementById("screen");
+    s.innerHTML=layout(
+        `<span class="back" onclick="${album?'showAlbums()':'showMenu()'}">← Regresar</span> ${album||'Videos'}`,
+        `<div class="list">${items}</div>`,
+        `Sistema bloqueado - Solo contenido autorizado`
+    );
 }
 
 function playVideo(){
     previousScreen=document.getElementById("screen").innerHTML;
-
-    const screen=document.getElementById("screen");
-    screen.innerHTML=`
+    document.getElementById("screen").innerHTML=`
         <div class="fullscreen-video">
-            <div class="video-header">
+            <div class="topbar">
                 <span class="back" onclick="closeVideo()">← Salir</span>
                 <span>Reproduciendo</span>
             </div>
-
             <div class="video-frame">
-                <iframe src="https://www.youtube.com/embed/Gc7Hv5EB8IM?autoplay=1"
-                allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1" allowfullscreen></iframe>
             </div>
-        </div>
-    `;
+        </div>`;
 }
 
 function closeVideo(){
