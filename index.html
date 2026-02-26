@@ -2,15 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-
 <title>Sistema Entretenimiento Autobús</title>
 
 <style>
 
-html, body{
+html,body{
     margin:0;
     padding:0;
     height:100%;
@@ -19,7 +17,6 @@ html, body{
     font-family:Arial, sans-serif;
 }
 
-/* viewport real móvil */
 body{
     height:100vh;
     height:100dvh;
@@ -36,7 +33,7 @@ body{
     background:#000;
     border-radius:20px;
     overflow:hidden;
-    box-shadow:0 0 40px rgba(0,0,0,0.9);
+    box-shadow:0 0 40px rgba(0,0,0,.9);
     display:flex;
 }
 
@@ -49,50 +46,19 @@ body{
     overflow:hidden;
 }
 
-/* --- layout vertical correcto --- */
+/* estructura vertical real */
+.topbar{padding:15px 25px;background:#111;display:flex;justify-content:space-between;align-items:center;font-size:18px;flex-shrink:0;position:relative}
+.footer{padding:12px;background:#111;text-align:center;font-size:14px;color:#777;flex-shrink:0}
+.content{flex:1;overflow:auto;display:flex;flex-direction:column}
 
-.topbar{
-    padding:15px 25px;
-    background:#111;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:18px;
-    flex-shrink:0;
-}
+/* pantallas */
 
-.footer{
-    padding:12px;
-    background:#111;
-    text-align:center;
-    font-size:14px;
-    color:#777;
-    flex-shrink:0;
-}
-
-/* área que crece y puede hacer scroll */
-.content{
-    flex:1;
-    overflow:auto;
-    display:flex;
-    flex-direction:column;
-}
-
-/* --- pantallas --- */
-
-.center{
-    flex:1;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    text-align:center;
-}
+.center{flex:1;display:flex;justify-content:center;align-items:center;flex-direction:column;text-align:center}
 
 .menu{
     flex:1;
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(180px, 220px));
+    grid-template-columns:repeat(auto-fit,minmax(180px,220px));
     gap:40px;
     justify-content:center;
     align-content:center;
@@ -111,21 +77,10 @@ body{
     aspect-ratio:1/1;
     font-size:18px;
 }
+.card:hover{background:#333;transform:scale(1.05)}
+.icon{font-size:60px;margin-bottom:15px}
 
-.card:hover{
-    background:#333;
-    transform:scale(1.05);
-}
-
-.icon{
-    font-size:60px;
-    margin-bottom:15px;
-}
-
-.list{
-    padding:30px;
-}
-
+.list{padding:30px}
 .video-item{
     background:#2b2b2b;
     padding:15px 20px;
@@ -136,50 +91,49 @@ body{
     align-items:center;
     font-size:18px;
 }
+.video-item:hover{background:#3a3a3a}
 
-.video-item:hover{
-    background:#3a3a3a;
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:25px;
+}
+.grid .video-item{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    aspect-ratio:1/1;
+    justify-content:center;
 }
 
-button{
-    padding:6px 12px;
-    border:none;
-    border-radius:6px;
-    background:#ff7a00;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
+button{padding:6px 12px;border:none;border-radius:6px;background:#ff7a00;color:white;font-weight:bold;cursor:pointer}
+button:hover{background:#ff9d3b}
 
-button:hover{
-    background:#ff9d3b;
-}
+.back{cursor:pointer;color:#ff7a00}
 
-.back{
-    cursor:pointer;
-    color:#ff7a00;
-}
+/* loading */
+.loading-logo{font-size:80px;animation:moveBus 1s infinite alternate}
+@keyframes moveBus{from{transform:translateX(-20px)}to{transform:translateX(20px)}}
 
-/* video fullscreen */
-
-.fullscreen-video{
+/* dropdown */
+.menu-dots{cursor:pointer;font-size:24px}
+.dropdown{
     position:absolute;
-    inset:0;
-    background:#000;
-    z-index:999;
-    display:flex;
+    right:25px;
+    top:55px;
+    background:#2b2b2b;
+    border-radius:8px;
+    overflow:hidden;
+    display:none;
     flex-direction:column;
 }
+.dropdown div{padding:10px 20px;cursor:pointer}
+.dropdown div:hover{background:#ff7a00}
 
-.video-frame{
-    flex:1;
-}
-
-.video-frame iframe{
-    width:100%;
-    height:100%;
-    border:none;
-}
+/* fullscreen video */
+.fullscreen-video{position:absolute;inset:0;background:#000;z-index:999;display:flex;flex-direction:column}
+.video-frame{flex:1}
+.video-frame iframe{width:100%;height:100%;border:none}
 
 </style>
 </head>
@@ -202,16 +156,6 @@ button:hover{
 let previousScreen="";
 let currentAlbum=null;
 
-function startSimulation(){
-    const s=document.getElementById("screen");
-    s.innerHTML=`
-        <div class="content center">
-            <h2>Cargando contenido...</h2>
-        </div>
-    `;
-    setTimeout(showMenu,1500);
-}
-
 function layout(top,content,footer){
     return `
         <div class="topbar">${top}</div>
@@ -220,10 +164,21 @@ function layout(top,content,footer){
     `;
 }
 
+/* LOADING con autobús */
+function startSimulation(){
+    const s=document.getElementById("screen");
+    s.innerHTML=`
+        <div class="content center">
+            <div class="loading-logo">🚌</div>
+            <h2>Cargando contenido...</h2>
+        </div>`;
+    setTimeout(showMenu,2000);
+}
+
 function showMenu(){
     const s=document.getElementById("screen");
     s.innerHTML=layout(
-        `Bienvenido <span>Autobuses Black</span>`,
+        `<span>Bienvenido</span><span>Autobuses Black</span>`,
         `<div class="menu">
             <div class="card" onclick="showAlbums()">
                 <div class="icon">📁</div>Álbumes
@@ -239,7 +194,7 @@ function showMenu(){
 function showAlbums(){
     const s=document.getElementById("screen");
     s.innerHTML=layout(
-        `<span class="back" onclick="showMenu()">← Regresar</span> Álbumes`,
+        `<span class="back" onclick="showMenu()">← Regresar</span><span>Álbumes</span>`,
         `<div class="list">
             <div class="video-item" onclick="showVideos('Acción')">🎥 Acción</div>
             <div class="video-item" onclick="showVideos('Infantil')">👶 Infantil</div>
@@ -263,10 +218,27 @@ function showVideos(album=null){
 
     const s=document.getElementById("screen");
     s.innerHTML=layout(
-        `<span class="back" onclick="${album?'showAlbums()':'showMenu()'}">← Regresar</span> ${album||'Videos'}`,
-        `<div class="list">${items}</div>`,
+        `<span class="back" onclick="${album?'showAlbums()':'showMenu()'}">← Regresar</span>
+         <span>${album||'Videos'}</span>
+         <span class="menu-dots" onclick="toggleMenu()">⋮</span>
+         <div id="dropdown" class="dropdown">
+            <div onclick="setMode('list')">Modo Lista</div>
+            <div onclick="setMode('grid')">Modo Mosaico</div>
+         </div>`,
+        `<div id="videoContainer" class="list">${items}</div>`,
         `Sistema bloqueado - Solo contenido autorizado`
     );
+}
+
+function toggleMenu(){
+    const m=document.getElementById("dropdown");
+    m.style.display=m.style.display==="flex"?"none":"flex";
+}
+
+function setMode(mode){
+    const c=document.getElementById("videoContainer");
+    c.className=mode==="grid"?"list grid":"list";
+    document.getElementById("dropdown").style.display="none";
 }
 
 function playVideo(){
