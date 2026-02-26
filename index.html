@@ -2,23 +2,43 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="manifest" href="manifest.json">
+
 <title>Sistema Entretenimiento Autobús</title>
 
 <style>
-body{
+
+html, body{
     margin:0;
+    padding:0;
+    height:100%;
+    overflow:hidden;
+    touch-action:none;
     background:#111;
     font-family:Arial, sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
+}
+
+/* altura real en móviles */
+body{
     height:100vh;
+    height:100dvh;
 }
 
 .tablet{
     width:1024px;
     height:600px;
+    max-width:100vw;
+    max-height:100dvh;
     background:#000;
     border-radius:20px;
     overflow:hidden;
@@ -184,14 +204,11 @@ button:hover{
     background:#ff7a00;
 }
 
-/* ===== VIDEO FULLSCREEN ===== */
+/* VIDEO FULLSCREEN */
 
 .fullscreen-video{
     position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    inset:0;
     background:#000;
     z-index:999;
     display:flex;
@@ -216,8 +233,25 @@ button:hover{
     border:none;
 }
 
+/* bloquear uso vertical */
+@media screen and (orientation: portrait){
+    body::before{
+        content:"Gira la pantalla";
+        position:fixed;
+        inset:0;
+        background:#000;
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:30px;
+        z-index:9999;
+    }
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="tablet">
@@ -231,26 +265,23 @@ button:hover{
 
 <script>
 
-let lastView = "menu";
-let currentAlbum = null;
-let currentMode = "list";
-let previousScreen = "";
+let currentAlbum=null;
+let previousScreen="";
 
 function startSimulation(){
-    const screen = document.getElementById("screen");
-    screen.innerHTML = `
+    const screen=document.getElementById("screen");
+    screen.innerHTML=`
         <div class="center">
             <div class="loading-logo">🚌</div>
             <h2>Cargando contenido...</h2>
         </div>
     `;
-    setTimeout(showMenu, 2500);
+    setTimeout(showMenu,2000);
 }
 
 function showMenu(){
-    lastView="menu";
-    const screen = document.getElementById("screen");
-    screen.innerHTML = `
+    const screen=document.getElementById("screen");
+    screen.innerHTML=`
         <div class="topbar">
             <span>Bienvenido</span>
             <span>Autobuses Black</span>
@@ -274,9 +305,8 @@ function showMenu(){
 }
 
 function showAlbums(){
-    lastView="albums";
-    const screen = document.getElementById("screen");
-    screen.innerHTML = `
+    const screen=document.getElementById("screen");
+    screen.innerHTML=`
         <div class="topbar">
             <span class="back" onclick="showMenu()">← Regresar</span>
             <span>Álbumes</span>
@@ -296,27 +326,25 @@ function showAlbums(){
 }
 
 function showAllVideos(){
-    lastView="videos";
-    currentAlbum=null;
     showVideos();
 }
 
 function showVideos(album=null){
-    currentAlbum = album;
-    const screen = document.getElementById("screen");
+    currentAlbum=album;
+    const screen=document.getElementById("screen");
 
-    let videosHTML = "";
+    let videos="";
     for(let i=1;i<=40;i++){
-        videosHTML += `
+        videos+=`
         <div class="video-item">
             <div>🎬 Video ${i} ${album?'- '+album:''}</div>
             <button onclick="playVideo()">▶</button>
         </div>`;
     }
 
-    screen.innerHTML = `
+    screen.innerHTML=`
         <div class="topbar">
-            <span class="back" onclick="goBack()">← Regresar</span>
+            <span class="back" onclick="${album?'showAlbums()':'showMenu()'}">← Regresar</span>
             <span>${album?album:'Videos Disponibles'}</span>
             <span class="menu-dots" onclick="toggleMenu()">⋮</span>
 
@@ -327,7 +355,7 @@ function showVideos(album=null){
         </div>
 
         <div id="videoContainer" class="list">
-            ${videosHTML}
+            ${videos}
         </div>
 
         <div class="footer">
@@ -337,31 +365,21 @@ function showVideos(album=null){
 }
 
 function toggleMenu(){
-    const menu = document.getElementById("dropdown");
-    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    const m=document.getElementById("dropdown");
+    m.style.display=m.style.display==="flex"?"none":"flex";
 }
 
 function setMode(mode){
-    const container = document.getElementById("videoContainer");
-    container.className = mode === "grid" ? "list grid" : "list";
+    const c=document.getElementById("videoContainer");
+    c.className=mode==="grid"?"list grid":"list";
     document.getElementById("dropdown").style.display="none";
 }
 
-function goBack(){
-    if(currentAlbum){
-        showAlbums();
-    }else{
-        showMenu();
-    }
-}
-
-/* ===== REPRODUCCIÓN FULLSCREEN ===== */
-
 function playVideo(){
-    previousScreen = document.getElementById("screen").innerHTML;
+    previousScreen=document.getElementById("screen").innerHTML;
 
-    const screen = document.getElementById("screen");
-    screen.innerHTML = `
+    const screen=document.getElementById("screen");
+    screen.innerHTML=`
         <div class="fullscreen-video">
             <div class="video-header">
                 <span class="back" onclick="closeVideo()">← Salir</span>
@@ -369,18 +387,15 @@ function playVideo(){
             </div>
 
             <div class="video-frame">
-                <iframe 
-                    src="https://www.youtube.com/embed/Gc7Hv5EB8IM?start=154&autoplay=1&controls=1"
-                    allow="autoplay; encrypted-media"
-                    allowfullscreen>
-                </iframe>
+                <iframe src="https://www.youtube.com/embed/Gc7Hv5EB8IM?autoplay=1"
+                allow="autoplay; encrypted-media" allowfullscreen></iframe>
             </div>
         </div>
     `;
 }
 
 function closeVideo(){
-    document.getElementById("screen").innerHTML = previousScreen;
+    document.getElementById("screen").innerHTML=previousScreen;
 }
 
 </script>
