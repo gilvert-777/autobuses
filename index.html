@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Entretenimiento Autobús</title>
+
+<style>
+body{
+    margin:0;
+    background:#111;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.tablet{
+    width:1024px;
+    height:600px;
+    background:#000;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 0 40px rgba(0,0,0,0.9);
+}
+
+.screen{
+    width:100%;
+    height:100%;
+    background:#1a1a1a;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+}
+
+.center{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+}
+
+button{
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    background:#ff7a00;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#ff9d3b;
+}
+
+.loading-logo{
+    font-size:80px;
+    animation:moveBus 1s infinite alternate;
+}
+
+@keyframes moveBus{
+    from{transform:translateX(-20px);}
+    to{transform:translateX(20px);}
+}
+
+.topbar{
+    padding:15px 25px;
+    background:#111;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:18px;
+    position:relative;
+}
+
+.menu{
+    flex:1;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 220px));
+    gap:40px;
+    justify-content:center;
+    align-content:center;
+    padding:40px;
+}
+
+.card{
+    background:#262626;
+    border-radius:20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    transition:0.3s;
+    aspect-ratio:1/1;
+    font-size:18px;
+}
+
+.card:hover{
+    background:#333;
+    transform:scale(1.05);
+}
+
+.icon{
+    font-size:60px;
+    margin-bottom:15px;
+}
+
+.list{
+    flex:1;
+    padding:30px;
+    overflow-y:auto;
+}
+
+.video-item{
+    background:#2b2b2b;
+    padding:15px 20px;
+    margin-bottom:15px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:18px;
+}
+
+.video-item:hover{
+    background:#3a3a3a;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    gap:25px;
+}
+
+.grid .video-item{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    aspect-ratio:1/1;
+    justify-content:center;
+}
+
+.back{
+    cursor:pointer;
+    color:#ff7a00;
+}
+
+.footer{
+    padding:12px;
+    background:#111;
+    text-align:center;
+    font-size:14px;
+    color:#777;
+}
+
+.menu-dots{
+    cursor:pointer;
+    font-size:24px;
+}
+
+.dropdown{
+    position:absolute;
+    right:25px;
+    top:55px;
+    background:#2b2b2b;
+    border-radius:8px;
+    overflow:hidden;
+    display:none;
+    flex-direction:column;
+}
+
+.dropdown div{
+    padding:10px 20px;
+    cursor:pointer;
+}
+
+.dropdown div:hover{
+    background:#ff7a00;
+}
+
+/* ===== VIDEO FULLSCREEN ===== */
+
+.fullscreen-video{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#000;
+    z-index:999;
+    display:flex;
+    flex-direction:column;
+}
+
+.video-header{
+    padding:15px 25px;
+    background:rgba(0,0,0,0.8);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.video-frame{
+    flex:1;
+}
+
+.video-frame iframe{
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+</style>
+</head>
+<body>
+
+<div class="tablet">
+<div id="screen" class="screen">
+<div class="center">
+<h1>Sistema de Entretenimiento</h1>
+<button onclick="startSimulation()">Iniciar Sistema</button>
+</div>
+</div>
+</div>
+
+<script>
+
+let lastView = "menu";
+let currentAlbum = null;
+let currentMode = "list";
+let previousScreen = "";
+
+function startSimulation(){
+    const screen = document.getElementById("screen");
+    screen.innerHTML = `
+        <div class="center">
+            <div class="loading-logo">🚌</div>
+            <h2>Cargando contenido...</h2>
+        </div>
+    `;
+    setTimeout(showMenu, 2500);
+}
+
+function showMenu(){
+    lastView="menu";
+    const screen = document.getElementById("screen");
+    screen.innerHTML = `
+        <div class="topbar">
+            <span>Bienvenido</span>
+            <span>Autobuses Black</span>
+        </div>
+
+        <div class="menu">
+            <div class="card" onclick="showAlbums()">
+                <div class="icon">📁</div>
+                Álbumes
+            </div>
+            <div class="card" onclick="showAllVideos()">
+                <div class="icon">🎬</div>
+                Videos
+            </div>
+        </div>
+
+        <div class="footer">
+            Contenido especializado para tu viaje
+        </div>
+    `;
+}
+
+function showAlbums(){
+    lastView="albums";
+    const screen = document.getElementById("screen");
+    screen.innerHTML = `
+        <div class="topbar">
+            <span class="back" onclick="showMenu()">← Regresar</span>
+            <span>Álbumes</span>
+        </div>
+
+        <div class="list">
+            <div class="video-item" onclick="showVideos('Acción')">🎥 Acción</div>
+            <div class="video-item" onclick="showVideos('Infantil')">👶 Infantil</div>
+            <div class="video-item" onclick="showVideos('Comedia')">😂 Comedia</div>
+            <div class="video-item" onclick="showVideos('Documentales')">📚 Documentales</div>
+        </div>
+
+        <div class="footer">
+            Sistema bloqueado - Solo contenido autorizado
+        </div>
+    `;
+}
+
+function showAllVideos(){
+    lastView="videos";
+    currentAlbum=null;
+    showVideos();
+}
+
+function showVideos(album=null){
+    currentAlbum = album;
+    const screen = document.getElementById("screen");
+
+    let videosHTML = "";
+    for(let i=1;i<=40;i++){
+        videosHTML += `
+        <div class="video-item">
+            <div>🎬 Video ${i} ${album?'- '+album:''}</div>
+            <button onclick="playVideo()">▶</button>
+        </div>`;
+    }
+
+    screen.innerHTML = `
+        <div class="topbar">
+            <span class="back" onclick="goBack()">← Regresar</span>
+            <span>${album?album:'Videos Disponibles'}</span>
+            <span class="menu-dots" onclick="toggleMenu()">⋮</span>
+
+            <div id="dropdown" class="dropdown">
+                <div onclick="setMode('list')">Modo Lista</div>
+                <div onclick="setMode('grid')">Modo Mosaico</div>
+            </div>
+        </div>
+
+        <div id="videoContainer" class="list">
+            ${videosHTML}
+        </div>
+
+        <div class="footer">
+            Sistema bloqueado - Solo contenido autorizado
+        </div>
+    `;
+}
+
+function toggleMenu(){
+    const menu = document.getElementById("dropdown");
+    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+}
+
+function setMode(mode){
+    const container = document.getElementById("videoContainer");
+    container.className = mode === "grid" ? "list grid" : "list";
+    document.getElementById("dropdown").style.display="none";
+}
+
+function goBack(){
+    if(currentAlbum){
+        showAlbums();
+    }else{
+        showMenu();
+    }
+}
+
+/* ===== REPRODUCCIÓN FULLSCREEN ===== */
+
+function playVideo(){
+    previousScreen = document.getElementById("screen").innerHTML;
+
+    const screen = document.getElementById("screen");
+    screen.innerHTML = `
+        <div class="fullscreen-video">
+            <div class="video-header">
+                <span class="back" onclick="closeVideo()">← Salir</span>
+                <span>Reproduciendo</span>
+            </div>
+
+            <div class="video-frame">
+                <iframe 
+                    src="https://www.youtube.com/embed/Gc7Hv5EB8IM?start=154&autoplay=1&controls=1"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    `;
+}
+
+function closeVideo(){
+    document.getElementById("screen").innerHTML = previousScreen;
+}
+
+</script>
+
+</body>
+</html>
